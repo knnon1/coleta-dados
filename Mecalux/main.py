@@ -1,3 +1,4 @@
+import os
 import threading, time
 import json
 import subprocess
@@ -5,22 +6,19 @@ from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-import influxdb_client
-from influxdb_client import InfluxDBClient, Point
-from influxdb_client.client.write_api import SYNCHRONOUS
 import psycopg
+from dotenv import load_dotenv
 
 
-
-
+load_dotenv()
 
 # Variaveis
-login = []
-USUARIO = []
-SENHA = []
-IP = []
-DB = []
-
+login = [os.getenv("LOGIN"), os.getenv("SENHA")]
+USUARIO = os.getenv("USUARIO")
+SENHA = os.getenv("SENHA")
+IP = os.getenv("IP")
+DB = os.getenv("DB")
+print(DB)
 conn = psycopg.connect(
     user=USUARIO,
     password=SENHA,
@@ -185,21 +183,7 @@ try:
             valor_rej_resf = valor_rejeito_resfriado.text.replace(".", "")
             valor_exp_resf = valor_expedido_resfriado.text.replace(".", "")
             # Abre um payload para mensagem com o DB
-            point_Resf_entrada = (
-                Point("Relatorio")
-                .tag("TOTResfriado", "entrada")
-                .field("field1", int(valor_ent_resf))
-            )
-            point_Resf_rejeito = (
-                Point("Relatorio")
-                .tag("TOTResfriado", "rejeito")
-                .field("field1", int(valor_rej_resf))
-            )
-            point_Resf_expedido = (
-                Point("Relatorio")
-                .tag("TOTResfriado", "expedido")
-                .field("field1", int(valor_exp_resf))
-            )
+
             #verifica se o ultimo valor é igual ao anterior e soma 1 ao tempo
             if valor_ent_resf == ult_valor_ent_r:
                 tmp_ent_r +=1
@@ -244,36 +228,6 @@ try:
                 #arquivoHH.write('{"entCong": 0, "rejCong": 0, "expCong": 0}')
                 arquivoHH.write('{"entCong":'+valor_ent_cong+', "rejCong":'+valor_rej_cong+', "expCong":'+valor_exp_cong+', "entResf":'+valor_ent_resf+', "rejResf":'+valor_rej_resf+', "expResf":'+valor_exp_resf+'}')
                 arquivoHH.close()
-                point_entCongHora = (
-                    Point("Relatorio")
-                    .tag("TOTCongelado", "entCongHora")
-                    .field("field1", vetPaleteCongHora[0])
-                )
-                point_rejCongHora= (
-                    Point("Relatorio")
-                    .tag("TOTCongelado", "rejCongHora")
-                    .field("field1", vetPaleteCongHora[1])
-                )
-                point_expCongHora = (
-                    Point("Relatorio")
-                    .tag("TOTCongelado", "expCongHora")
-                    .field("field1", vetPaleteCongHora[2])
-                )
-                point_entResfHora = (
-                    Point("Relatorio")
-                    .tag("TOTResfriado", "entResfHora")
-                    .field("field1", vetPaleteResfHora[0])
-                )
-                point_rejResfHora = (
-                    Point("Relatorio")
-                    .tag("TOTResfriado", "rejResfHora")
-                    .field("field1", vetPaleteResfHora[1])
-                )
-                point_expResfHora = (
-                    Point("Relatorio")
-                    .tag("TOTResfriado", "expResfHora")
-                    .field("field1", vetPaleteResfHora[2])
-                )
 
                 HH_paletes = verifica_contentor()
                 with conn.cursor() as cur:
