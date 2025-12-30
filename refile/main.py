@@ -9,8 +9,8 @@ import re
 import os
 import psycopg2
 
+#variaveis
 i = 0
-
 ultima_hora = datetime.now()
 while i < 10:
 
