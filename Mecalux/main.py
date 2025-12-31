@@ -6,7 +6,7 @@ from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-import psycopg
+import psycopg2 as psycopg
 from dotenv import load_dotenv
 
 
@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Variaveis
-login = [os.getenv("LOGIN"), os.getenv("SENHA")]
+login = [os.getenv("LOGIN"), os.getenv("SENHAMEC")]
 USUARIO = os.getenv("USUARIO")
 SENHA = os.getenv("SENHA")
 IP = os.getenv("IP")
