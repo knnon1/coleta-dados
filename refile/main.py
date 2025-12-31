@@ -8,11 +8,12 @@ import json
 import re
 import os
 import psycopg2
+import pyautogui
 
-#variaveis
 i = 0
+
 ultima_hora = datetime.now()
-while i < 10:
+while i<10:
 
     try:
         conn = psycopg2.connect(
@@ -64,52 +65,57 @@ while i < 10:
 
                 driver.get("http://192.168.12.200:8080/jasperserver/login.html")
 
-                time.sleep(1)
-                palete_escravo = driver.find_element(By.XPATH,
-                                                     '/html/body/div[4]/div/div/div[1]/form/div/div/div[2]/div[2]/fieldset[1]/input[1]')
-                palete_escravo.send_keys("")
-                palete_escravo = driver.find_element(By.XPATH,
-                                                     '/html/body/div[4]/div/div/div[1]/form/div/div/div[2]/div[2]/fieldset[1]/input[2]')
-                palete_escravo.send_keys("")
-                palete_escravo.send_keys(Keys.RETURN)
-                time.sleep(1)
-                check_input = driver.find_element(By.XPATH,
-                                                  "/html/body/div[4]/div/div/div[4]/div[3]/div[2]/ul/li/ul/li[3]/p/b")
-                check_input.click()
-                time.sleep(1)
-                check_input = driver.find_element(By.XPATH,
-                                                  "/html/body/div[4]/div/div/div[2]/div/div[2]/ul/li[1]/div/div[2]/p[1]/a")
-                check_input.click()
-                time.sleep(1)
+                time.sleep(5)
+                pyautogui.moveTo(378, 404)
+                pyautogui.click()
+                pyautogui.write(login[0], interval=0.1)
+
+                pyautogui.moveTo(377, 473)
+                pyautogui.click()
+                pyautogui.write(login[1], interval=0.1)
+
+                pyautogui.press('enter')
+                time.sleep(2)
+ 
+                pyautogui.moveTo(102, 339)
+                pyautogui.click()
+                time.sleep(2)
+
+                pyautogui.moveTo(311, 296)
+                pyautogui.click()
+                time.sleep(2)
+
                 now = datetime.now()  ######################
                 hora_anterior = now - timedelta(hours=1)
-                check_input = driver.find_element(By.XPATH,
-                                                  "/html/body/div[8]/div[2]/div[2]/div/div/div/ul/div[1]/label/input")
-                check_input.send_keys(hora_anterior.strftime("%Y-%m-%d %H:00:00"))
-                check_input.send_keys(Keys.RETURN)
-                time.sleep(1)
-                check_input = driver.find_element(By.XPATH,
-                                                  "/html/body/div[7]/div[2]/div[2]/div/div/div/ul/div[2]/label/input")
-                check_input.send_keys(now.strftime("%Y-%m-%d %H:00:00"))
-                time.sleep(1)
-                check_input = driver.find_element(By.XPATH, "/html/body/div[7]/div[2]/div[3]/button[1]/span")
-                check_input.click()
-                time.sleep(5)
-                check_input = driver.find_element(By.XPATH, "/html/body/div[7]/div[2]/div[3]/button[2]/span")
-                check_input.click()
-                time.sleep(1)
-                check_input = driver.find_element(By.XPATH,
-                                                  "/html/body/div[4]/div/div/div[2]/div/div[2]/ul[1]/li[4]/button")
-                check_input.click()
-                # if os.path.isfile('C://Users//Guilherme Luna//Downloads//teste//JBS_R2.pdf'):
-                #    os.remove('C://Users//Guilherme Luna//Downloads//teste//JBS_R2.pdf')
+                pyautogui.moveTo(306, 269) #data inicio
+                pyautogui.click()
+                time.sleep(2)
+                pyautogui.write(hora_anterior.strftime("%Y-%m-%d %H:00:00"), interval=0.1)
+                time.sleep(2)
 
+                pyautogui.moveTo(311, 340) # data fim
+                pyautogui.click()
+                time.sleep(2)
+                pyautogui.write(now.strftime("%Y-%m-%d %H:00:00"), interval=0.1)
+                time.sleep(3)
+
+                pyautogui.moveTo(299, 688) #aplicar
+                pyautogui.click()
+                time.sleep(3)
+
+                pyautogui.moveTo(367, 689) #ok
+                pyautogui.click()
+                time.sleep(3)
                 if os.path.isfile('C://Users//DADOS_REFILE//Desktop//refile//relatorio//JBS_R2.pdf'):
                     os.remove('C://Users//DADOS_REFILE//Desktop//refile//relatorio//JBS_R2.pdf')
-                time.sleep(1)
-                check_input = driver.find_element(By.XPATH, "/html/body/div[6]/div[1]/div/ul/li[1]/p")
-                check_input.click()
-                time.sleep(5)
+                pyautogui.moveTo(161, 230) #menu
+                pyautogui.click()
+                time.sleep(3)
+
+                pyautogui.moveTo(210, 262) #download pdf
+                pyautogui.click()
+                time.sleep(3)
+
                 driver.quit()
 
                 # pdf_file = open('C://Users//Guilherme Luna//Downloads//teste//JBS_R2.pdf', 'rb')
@@ -130,12 +136,13 @@ while i < 10:
                     print("pagina ", i + 1)
                     with open('pg' + str(i), 'r') as f:
                         texto = f.read()
+                    
 
                     for linha in texto.splitlines():
                         linha = linha.strip()
                         if not linha:
                             continue
-
+                        
                         # Verifica posto
                         m_posto = regex_posto.search(linha)
                         if m_posto:
