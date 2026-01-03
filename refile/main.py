@@ -117,62 +117,62 @@ while i<10:
                 time.sleep(3)
 
                 driver.quit()
-
-                # pdf_file = open('C://Users//Guilherme Luna//Downloads//teste//JBS_R2.pdf', 'rb')
-                pdf_file = open('C://Users//DADOS_REFILE//Desktop//refile//relatorio//JBS_R2.pdf', 'rb')
-                read_pdf = PyPDF2.PdfReader(pdf_file)
-
-                for i in range(len(read_pdf.pages)):
-                    page = read_pdf.pages[i]
-                    page_content = page.extract_text()
-                    # data = json.dumps(page_content) #fazer regex para coletar dados pont > peso - sku - quantidade - nome
-                    # paginas.append(data)
-                    arquivo = open('pg' + str(i), 'w')
-                    arquivo.write(page_content)
-                    arquivo.close()
-
-                ###############################
-                for i in range(len(read_pdf.pages)):
-                    print("pagina ", i + 1)
-                    with open('pg' + str(i), 'r') as f:
-                        texto = f.read()
-                    
-
-                    for linha in texto.splitlines():
-                        linha = linha.strip()
-                        if not linha:
-                            continue
+                if os.path.isfile('C://Users//DADOS_REFILE//Desktop//refile//relatorio//JBS_R2.pdf'):
+                    # pdf_file = open('C://Users//Guilherme Luna//Downloads//teste//JBS_R2.pdf', 'rb')
+                    pdf_file = open('C://Users//DADOS_REFILE//Desktop//refile//relatorio//JBS_R2.pdf', 'rb')
+                    read_pdf = PyPDF2.PdfReader(pdf_file)
+    
+                    for i in range(len(read_pdf.pages)):
+                        page = read_pdf.pages[i]
+                        page_content = page.extract_text()
+                        # data = json.dumps(page_content) #fazer regex para coletar dados pont > peso - sku - quantidade - nome
+                        # paginas.append(data)
+                        arquivo = open('pg' + str(i), 'w')
+                        arquivo.write(page_content)
+                        arquivo.close()
+    
+                    ###############################
+                    for i in range(len(read_pdf.pages)):
+                        print("pagina ", i + 1)
+                        with open('pg' + str(i), 'r') as f:
+                            texto = f.read()
                         
-                        # Verifica posto
-                        m_posto = regex_posto.search(linha)
-                        if m_posto:
-                            posto_atual = int(m_posto.group("posto"))
-                            continue
-                        # Verifica item
-                        m_item = regex_item.search(linha)
-                        if m_item and posto_atual is not None:
-                            item = {
-                                "posto": posto_atual,
-                                "peso": m_item.group("peso"),
-                                "sku": m_item.group("sku"),
-                                "quantidade": int(m_item.group("quantidade")),
-                                "nome": m_item.group("nome").strip()
-                            }
-                            if item['sku'] == 'descartar':
-                                item['sku'] = '404'
-                            item['sku'] = item["sku"].replace(' - ', '')
-                            resultado.append(item)
-                for r in resultado:
-                    float_value = r["peso"].replace('.', '')
-                    float_value = float(float_value.replace(',', '.'))
-                    hora_atual = datetime.now()  ######################
-                    hora_anterior_1 = now - timedelta(hours=1)
-                    datatime = hora_anterior_1.strftime("%Y-%m-%d %H:00:15")
-                    cur.execute(
-                        f"INSERT INTO REFILE_H (PONTO,SKU, PESO, QUANTIDADE, NOME, DATETIME) VALUES ({r['posto']},{r["sku"]},{float_value},{r["quantidade"]}, \'{str(r["nome"])}\', \'{datatime}\');")
-                    conn.commit()
-
-                pdf_file.close()
+    
+                        for linha in texto.splitlines():
+                            linha = linha.strip()
+                            if not linha:
+                                continue
+                            
+                            # Verifica posto
+                            m_posto = regex_posto.search(linha)
+                            if m_posto:
+                                posto_atual = int(m_posto.group("posto"))
+                                continue
+                            # Verifica item
+                            m_item = regex_item.search(linha)
+                            if m_item and posto_atual is not None:
+                                item = {
+                                    "posto": posto_atual,
+                                    "peso": m_item.group("peso"),
+                                    "sku": m_item.group("sku"),
+                                    "quantidade": int(m_item.group("quantidade")),
+                                    "nome": m_item.group("nome").strip()
+                                }
+                                if item['sku'] == 'descartar':
+                                    item['sku'] = '404'
+                                item['sku'] = item["sku"].replace(' - ', '')
+                                resultado.append(item)
+                    for r in resultado:
+                        float_value = r["peso"].replace('.', '')
+                        float_value = float(float_value.replace(',', '.'))
+                        hora_atual = datetime.now()  ######################
+                        hora_anterior_1 = now - timedelta(hours=1)
+                        datatime = hora_anterior_1.strftime("%Y-%m-%d %H:00:15")
+                        cur.execute(
+                            f"INSERT INTO REFILE_H (PONTO,SKU, PESO, QUANTIDADE, NOME, DATETIME) VALUES ({r['posto']},{r["sku"]},{float_value},{r["quantidade"]}, \'{str(r["nome"])}\', \'{datatime}\');")
+                        conn.commit()
+    
+                    pdf_file.close()
                 ultima_hora = datetime.now()
                 time.sleep(1)
                 print(datetime.now())
